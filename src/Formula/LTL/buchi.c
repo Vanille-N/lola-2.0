@@ -42,8 +42,8 @@ extern void put_uform(void);
 
 extern FILE *tl_out;
 BState *bstack, *bstates, *bremoved;
-BScc *scc_stack;
-int accepting_state, bstate_count = 0, btrans_count = 0, rank;
+BScc *bscc_stack;
+int accepting_state, bstate_count = 0, btrans_count = 0, brank;
 
 /********************************************************************\
 |*        Simplification of the generalized Buchi automaton         *|
@@ -263,10 +263,10 @@ int bdfs(BState *s)
     BScc *c;
     BScc *scc = (BScc *)tl_emalloc(sizeof(BScc));
     scc->bstate = s;
-    scc->rank = rank;
-    scc->theta = rank++;
-    scc->nxt = scc_stack;
-    scc_stack = scc;
+    scc->rank = brank;
+    scc->theta = brank++;
+    scc->nxt = bscc_stack;
+    bscc_stack = scc;
 
     s->incoming = 1;
 
@@ -279,7 +279,7 @@ int bdfs(BState *s)
         }
         else
         {
-            for (c = scc_stack->nxt; c != 0; c = c->nxt)
+            for (c = bscc_stack->nxt; c != 0; c = c->nxt)
                 if (c->bstate == t->to)
                 {
                     scc->theta = min(scc->theta, c->rank);
@@ -289,7 +289,7 @@ int bdfs(BState *s)
     }
     if (scc->rank == scc->theta)
     {
-        if (scc_stack == scc)  /* s is alone in a scc */
+        if (bscc_stack == scc)  /* s is alone in a scc */
         {
             s->incoming = -1;
             for (t = s->trans->nxt; t != s->trans; t = t->nxt)
@@ -298,7 +298,7 @@ int bdfs(BState *s)
                     s->incoming = 1;
                 }
         }
-        scc_stack = scc->nxt;
+        bscc_stack = scc->nxt;
     }
     return scc->theta;
 }
@@ -306,8 +306,8 @@ int bdfs(BState *s)
 void simplify_bscc()
 {
     BState *s;
-    rank = 1;
-    scc_stack = 0;
+    brank = 1;
+    bscc_stack = 0;
 
     if (bstates == bstates->nxt)
     {
