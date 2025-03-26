@@ -7,6 +7,14 @@
                       http://service-technology.org/lola
 
 
+==========
+This project is a mirror of LoLA 2.0
+([https://theo.informatik.uni-rostock.de/theo-forschung/tools/lola/](original)),
+patched to fix a compilation error due to name collisions in global variables.
+==========
+
+
+
 Setup and installation
 ----------------------
 
